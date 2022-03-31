@@ -48,6 +48,8 @@ class InfinityDialogueBox extends FlxSpriteGroup
 
     public var dialogueOpened:Bool = false;
 
+    public var dialogue:Array<DialogueContent> = [];
+
     public function new(json:DialogueData, ?skin:String = "default")
     {
         super();
@@ -84,21 +86,24 @@ class InfinityDialogueBox extends FlxSpriteGroup
         box.visible = false;
         add(box);
 
-        trace("FIRST LINE OF DIALOGUE:" + dialogueJson.dialogue[0].text);
-        alphabet = new Alphabet(box.x + 100, box.y + 300, "???", false, true, 0.05);
+        dialogue = [];
+        dialogue = dialogueJson.dialogue;
+        trace(dialogue);
+
+        trace("FIRST LINE OF DIALOGUE:" + dialogue[0].text);
+        renderDialogue("");
         alphabet.visible = false;
-        add(alphabet);
         trace("ALPHABET BULLSHIT EXISTS!");
 
         FlxTween.tween(cover, {alpha: 0.7}, 1, {
             ease: FlxEase.cubeInOut,
-            startDelay: 0.83
+            startDelay: 0.5
         });
         trace("fuck!");
 
         // REMEMBER TO FIX THIS!!! IT CRASHES FOR SOME REASON!
 
-		/*new FlxTimer().start(1, function(tmr:FlxTimer){
+		new FlxTimer().start(1, function(tmr:FlxTimer){
             dialogueOpened = true;
             trace("fuck 2!");
 
@@ -109,11 +114,10 @@ class InfinityDialogueBox extends FlxSpriteGroup
 
             new FlxTimer().start(0.15, function(tmr:FlxTimer){
                 alphabet.visible = true;
+                alphabet.changeText(dialogue[0].text, dialogue[0].speed);
                 trace("fuck 5!");
-                alphabet.changeText(dialogueJson.dialogue[0].text, 0.05);
-                trace("fuck 6!");
             });
-        });*/
+        });
     }
 
     function addBoxAnims()
@@ -121,16 +125,20 @@ class InfinityDialogueBox extends FlxSpriteGroup
         // standard version
 
         var anim = dialogueBoxJson.open_anim;
+        trace(anim);
         box.animation.addByPrefix('open', anim[0], anim[1], anim[2]);
 
         var anim = dialogueBoxJson.idle_anim;
+        trace(anim);
         box.animation.addByPrefix('idle', anim[0], anim[1], anim[2]);
 
         // angry version
         var anim = dialogueBoxJson.angry_open_anim;
+        trace(anim);
         box.animation.addByPrefix('angry-open', anim[0], anim[1], anim[2]);
 
         var anim = dialogueBoxJson.angry_idle_anim;
+        trace(anim);
         box.animation.addByPrefix('angry-idle', anim[0], anim[1], anim[2]);
     }
 
@@ -155,18 +163,63 @@ class InfinityDialogueBox extends FlxSpriteGroup
             }
         }
 
+        if(FlxG.keys.justPressed.ANY && !FlxG.keys.justPressed.SHIFT && dialogueOpened)
+        {
+            nextDialogue();
+        }
+
         if(!closing && FlxG.keys.justPressed.SHIFT)
         {
-            dialogueOpened = false;
-            closing = true;
-            box.animation.play('open', true, true);
-            FlxTween.tween(cover, {alpha: 0}, 1, {
-                ease: FlxEase.cubeInOut,
-                onComplete: function(a){
-                    finishThing();
-                    kill();
-                }
-            });
+            FlxG.sound.play(Paths.sound('clickText')); // will use actual sound when i get one
+            endDialogue();
         }
+    }
+
+    function nextDialogue()
+    {
+        FlxG.sound.play(Paths.sound('clickText')); // will use actual sound when i get one
+
+        if(dialogue[1] == null && dialogue[0] != null)
+        {
+            endDialogue();
+        }
+        else
+        {
+            dialogue.remove(dialogue[0]);
+
+            alphabet.killTheTimer();
+            alphabet.kill();
+            alphabet.destroy();
+
+            renderDialogue();
+        }
+    }
+
+    function renderDialogue(?text:String)
+    {
+        if(text == null)
+            text = dialogue[0].text;
+
+        alphabet = new Alphabet(0, box.y + 60, text, false, true, dialogue[0].speed, 0.7);
+        alphabet.x += box.x;
+        add(alphabet);
+    }
+
+    function endDialogue()
+    {
+        dialogue = [];
+
+        dialogueOpened = false;
+        closing = true;
+        alphabet.visible = false;
+
+        box.animation.play('open', true, true);
+        FlxTween.tween(cover, {alpha: 0}, 1, {
+            ease: FlxEase.cubeInOut,
+            onComplete: function(a){
+                finishThing();
+                kill();
+            }
+        });
     }
 }

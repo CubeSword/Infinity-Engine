@@ -686,12 +686,12 @@ class PlayState extends MusicBeatState
 			startCountdown();
 		else
 		{
-			inCutscene = true;
-			
 			var doof:InfinityDialogueBox = new InfinityDialogueBox(dialogueJson);
 			doof.cameras = [camHUD];
 			doof.finishThing = startCountdown;
 			add(doof);
+
+			inCutscene = true;
 		}
 	}
 

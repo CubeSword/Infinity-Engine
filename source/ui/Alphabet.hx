@@ -1,8 +1,7 @@
 package ui;
 
-import flixel.util.FlxColor;
-import options.OptionsHandler;
 import util.CoolUtil;
+import options.OptionsHandler;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -79,11 +78,17 @@ class Alphabet extends FlxSpriteGroup
 	public function changeText(newText:String, newTypingSpeed:Float = -1)
 	{
 		for (i in 0...lettersArray.length) {
-			var letter = lettersArray[0];
-			letter.destroy();
+			var letter = lettersArray[i];
 			remove(letter);
-			lettersArray.remove(letter);
+			letter.kill();
+			letter.destroy();
 		}
+		/*for (letter in members)
+		{
+			remove(letter);
+			letter.kill();
+			letter.destroy();
+		}*/
 		lettersArray = [];
 		splitWords = [];
 		loopNum = 0;
@@ -201,13 +206,18 @@ class Alphabet extends FlxSpriteGroup
 	var xPos:Float = 0;
 	public var curRow:Int = 0;
 	var dialogueSound:FlxSound = null;
-	private static var soundDialog:Sound = null;
+	private static var soundDialog:Dynamic = null;
 	var consecutiveSpaces:Int = 0;
 	public static function setDialogueSound(name:String = '')
 	{
-		if (name == null || name.trim() == '') name = 'dialogue';
+		/*if (name == null || name.trim() == '') name = 'dialogue';
 		soundDialog = Paths.sound(name);
-		if(soundDialog == null) soundDialog = Paths.sound('dialogue');
+		if(soundDialog == null) soundDialog = Paths.sound('dialogue');*/
+
+		// week 6 sounds until i get actual sounds
+		if (name == null || name.trim() == '') name = 'pixelText';
+		soundDialog = Paths.sound(name);
+		if(soundDialog == null) soundDialog = Paths.sound('pixelText');
 	}
 
 	var typeTimer:FlxTimer = null;
@@ -220,7 +230,7 @@ class Alphabet extends FlxSpriteGroup
 
 		if(soundDialog == null)
 		{
-			setDialogueSound();
+			Alphabet.setDialogueSound();
 		}
 
 		if(speed <= 0) {
