@@ -155,7 +155,6 @@ class StoryMenuState extends MusicBeatState
 		sprDifficulty.animation.addByPrefix('normal', 'NORMAL');
 		sprDifficulty.animation.addByPrefix('hard', 'HARD');
 		sprDifficulty.animation.play('easy');
-		changeDifficulty();
 
 		difficultySelectors.add(sprDifficulty);
 
@@ -165,6 +164,8 @@ class StoryMenuState extends MusicBeatState
 		rightArrow.animation.addByPrefix('press', "arrow push right", 24, false);
 		rightArrow.animation.play('idle');
 		difficultySelectors.add(rightArrow);
+
+		changeDifficulty();
 
 		trace("Line 150");
 
@@ -465,10 +466,13 @@ class StoryMenuState extends MusicBeatState
 				else
 					leftArrow.animation.play('idle');
 
-				if (controls.UI_RIGHT_P)
-					changeDifficulty(1);
-				if (controls.UI_LEFT_P)
-					changeDifficulty(-1);
+				if(!ctrl)
+				{
+					if (controls.UI_RIGHT_P)
+						changeDifficulty(1);
+					if (controls.UI_LEFT_P)
+						changeDifficulty(-1);
+				}
 			}
 
 			if (controls.ACCEPT)
@@ -552,20 +556,22 @@ class StoryMenuState extends MusicBeatState
 		if (curDifficulty > 2)
 			curDifficulty = 0;
 
-		sprDifficulty.offset.x = 0;
+		//sprDifficulty.offset.x = 0;
 
 		switch (curDifficulty)
 		{
 			case 0:
 				sprDifficulty.animation.play('easy');
-				sprDifficulty.offset.x = 20;
+				//sprDifficulty.offset.x = 20;
 			case 1:
 				sprDifficulty.animation.play('normal');
-				sprDifficulty.offset.x = 70;
+				//sprDifficulty.offset.x = 70;
 			case 2:
 				sprDifficulty.animation.play('hard');
-				sprDifficulty.offset.x = 20;
+				//sprDifficulty.offset.x = 20;
 		}
+
+		sprDifficulty.updateHitbox();
 
 		sprDifficulty.alpha = 0;
 
@@ -573,15 +579,20 @@ class StoryMenuState extends MusicBeatState
 		sprDifficulty.y = leftArrow.y - 15;
 		intendedScore = Highscore.getWeekScore(jsons[curWeek], curDifficulty);
 
-		#if !switch
-		intendedScore = Highscore.getWeekScore(jsons[curWeek], curDifficulty);
-		#end
+		positionDiff();
 
 		FlxTween.tween(sprDifficulty, {y: leftArrow.y + 15, alpha: 1}, 0.07);
 	}
 
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
+
+	function positionDiff()
+	{
+		leftArrow.x = grpWeekText.members[0].x + grpWeekText.members[0].width + 10;
+		sprDifficulty.x = leftArrow.x + 60;
+		rightArrow.x = sprDifficulty.x + sprDifficulty.width + 10;
+	}
 
 	function changeWeek(change:Int = 0):Void
 	{
@@ -613,6 +624,8 @@ class StoryMenuState extends MusicBeatState
 		txtWeekTitle.x = FlxG.width - (txtWeekTitle.width + 10);
 
 		coloredBG.color = FlxColor.fromString(Paths.getHexCode(json.background_color));
+
+		positionDiff();
 	}
 
 	function updateText()

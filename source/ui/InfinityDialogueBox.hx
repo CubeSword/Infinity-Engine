@@ -134,6 +134,8 @@ class InfinityDialogueBox extends FlxSpriteGroup
         box.animation.addByPrefix('angry-idle', anim[0], anim[1], anim[2]);
     }
 
+    var closing:Bool = false;
+
     override public function update(elapsed:Float)
     {
         super.update(elapsed);
@@ -145,16 +147,18 @@ class InfinityDialogueBox extends FlxSpriteGroup
                 if(box.animation.curAnim.name.contains('open') && box.animation.curAnim.finished)
                     box.animation.play('idle');
             }
-            else
+            
+            if(closing)
             {
                 if(box.animation.curAnim.name.contains('open') && box.animation.curAnim.curFrame == 0)
                     box.visible = false;
             }
         }
 
-        if(FlxG.keys.justPressed.SHIFT)
+        if(!closing && FlxG.keys.justPressed.SHIFT)
         {
             dialogueOpened = false;
+            closing = true;
             box.animation.play('open', true, true);
             FlxTween.tween(cover, {alpha: 0}, 1, {
                 ease: FlxEase.cubeInOut,

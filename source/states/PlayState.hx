@@ -359,13 +359,13 @@ class PlayState extends MusicBeatState
 				curStage = 'stage';
 			case 'spookeez' | 'south' | 'monster': 
 				curStage = 'spooky';
-			case 'pico' | 'philly-nice' | 'blammed': 
+			case 'pico' | 'philly nice' | 'blammed': 
 				curStage = 'philly';
 			case 'satin-panties' | 'high' | 'm.i.l.f': 
 				curStage = 'limo';
 			case 'cocoa' | 'eggnog': 
 				curStage = 'mall';
-			case 'winter-horrorland':
+			case 'winter horrorland':
 				curStage = 'mallEvil';
 			case 'senpai' | 'roses': 
 				curStage = 'school';
@@ -1625,7 +1625,7 @@ class PlayState extends MusicBeatState
 				{
 					if (daNote.tooLate || !daNote.wasGoodHit)
 					{
-						noteMiss(Math.floor(Math.abs(daNote.noteData)));
+						noteMiss(Math.floor(Math.abs(daNote.noteData)), daNote);
 						vocals.volume = 0;
 					}
 
@@ -2178,12 +2178,15 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	function noteMiss(direction:Int = 1):Void
+	function noteMiss(direction:Int = 1, ?note:Note = null):Void
 	{
 		if (!boyfriend.stunned)
 		{
 			health -= 0.0475;
-			songMisses++;
+
+			if(!note.isSustainNote || note == null)
+				songMisses++;
+
 			totalNoteStuffs++;
 			vocals.volume = 0;
 
@@ -2199,9 +2202,8 @@ class PlayState extends MusicBeatState
 
 			songScore -= 10;
 
-			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
-			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
-			// FlxG.log.add('played imss note');
+			if(!note.isSustainNote || note == null)
+				FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 
 			// bro fuck the stunned bull shit
 

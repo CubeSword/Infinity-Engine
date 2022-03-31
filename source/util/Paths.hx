@@ -396,7 +396,7 @@ class Paths
 	}
 
 	inline static public function formatToSongPath(path:String) {
-		return path;//.toLowerCase().replace(' ', '-');
+		return path.toLowerCase();//.replace(' ', '-');
 	}
 
 	inline public static function openURL(url:String)
